@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字游戏</title>
+    <style>
+        /* 整体样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #eef2f8;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        /* 暗色主题 */
+        body.dark-theme {
+            background-color: #1f1f1f;
+            color: #f0f0f0;
+        }
+        
+        .site-header {
+            text-align: left;
+            padding: 20px 0 40px 0;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .site-header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #333;
+        }
+        
+        body.dark-theme .site-header h1 {
+            color: #f0f0f0;
+        }
+        
+        /* 游戏容器 */
+        .game-container {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme .game-container {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-container:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        body.dark-theme h2 {
+            color: #e0e0e0;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            background: white;
+            color: #333;
+        }
+        
+        body.dark-theme input {
+            border-color: #4a4a4a;
+            background-color: #2d2d2d;
+            color: #f0f0f0;
+        }
+        
+        input:focus {
+            border-color: #4096ff;
+            outline: none;
+            box-shadow: 0 0 8px rgba(64, 150, 255, 0.3);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 100px;
+            background-color: #4096ff;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            background-color: #2a7de1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        body.dark-theme button:disabled {
+            background-color: #5d5d5d;
+        }
+        
+        .status {
+            margin: 15px 0;
+            font-weight: 500;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        body.dark-theme .status {
+            background-color: #3d3d3d;
+            color: #e0e0e0;
+        }
+        
+        .robot-action {
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        body.dark-theme .robot-action {
+            color: #cccccc;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .btn-group button {
+            flex: 1;
+        }
+        
+        /* 游戏说明 */
+        .instructions {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        
+        body.dark-theme .instructions {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        body.dark-theme .instructions h3 {
+            color: #e0e0e0;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+            color: #333;
+        }
+        
+        body.dark-theme .instructions ul {
+            color: #f0f0f0;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        /* 主题切换开关 */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-switch-label {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        body.dark-theme .theme-switch-label {
+            color: #cccccc;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .game-container,
+            .instructions {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 网站标题 -->
+    <header class="site-header">
+        <h1>数字游戏</h1>
+    </header>
+
+    <div class="game-container">
+        <h2>加数游戏</h2>
+        <div class="input-group">
+            <input type="number" id="targetNumber" placeholder="输入目标数字 (5-256)">
+            <button id="startButton" onclick="startGame()">开始游戏</button>
+        </div>
+        <div class="status" id="currentNumber">当前数字：0</div>
+        <div class="status" id="gameStatus">等待游戏开始...</div>
+        <div class="status robot-action" id="robotAction"></div>
+        <div class="buttons btn-group">
+            <button id="btn1" onclick="playerTurn(1)" disabled>+1</button>
+            <button id="btn2" onclick="playerTurn(2)" disabled>+2</button>
+            <button id="btn3" onclick="playerTurn(3)" disabled>+3</button>
+        </div>
+        
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+            <span class="theme-switch-label">切换主题</span>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>玩法介绍</h3>
+        <ul>
+            <li>在输入框中输入一个目标数字（范围为5到256），然后点击"开始游戏"。</li>
+            <li>游戏会随机决定玩家或机器人先手。</li>
+            <li>玩家可以通过点击+1、+2或+3按钮来增加当前数字。</li>
+            <li>机器人会自动随机增加1到3的数字。</li>
+            <li>谁先让当前数字达到或超过目标数字，谁就输掉比赛。</li>
+        </ul>
+    </div>
+
+    <script>
+        let target = 0;
+        let currentNumber = 0;
+        let isPlayerTurn = false;
+        let gameActive = false;
+        let lastRobotAction = 0;
+
+        function startGame() {
+            const targetInput = document.getElementById('targetNumber');
+            const startButton = document.getElementById('startButton');
+            target = parseInt(targetInput.value);
+            
+            if (isNaN(target) || target < 5 || target > 256) {
+                alert("请输入有效的目标数字（范围为5到256）");
+                return;
+            }
+
+            targetInput.disabled = true;
+            startButton.disabled = true;
+            currentNumber = 0;
+            gameActive = true;
+            document.getElementById('currentNumber').textContent = `当前数字：${currentNumber}`;
+            document.getElementById('robotAction').textContent = "";
+            
+            isPlayerTurn = Math.random() < 0.5;
+            document.getElementById('gameStatus').textContent = isPlayerTurn ? 
+                "玩家回合！" : "机器人回合...";
+            
+            updateButtonState();
+            if (!isPlayerTurn) {
+                setTimeout(robotTurn, 1000);
+            }
+        }
+
+        function playerTurn(num) {
+            if (!gameActive || !isPlayerTurn) return;
+            
+            currentNumber += num;
+            updateGameState();
+            
+            if (checkLoss()) {
+                gameOver(true);
+                return;
+            }
+            
+            isPlayerTurn = false;
+            document.getElementById('gameStatus').textContent = "机器人回合...";
+            updateButtonState();
+            setTimeout(robotTurn, 1000);
+        }
+
+        function robotTurn() {
+            if (!gameActive || isPlayerTurn) return;
+            
+            const difference = target - currentNumber;
+            let add = 1;
+            if (difference > 1) {
+                add = Math.floor(Math.random() * 3) + 1;
+            }
+            
+            currentNumber += add;
+            lastRobotAction = add;
+            document.getElementById('gameStatus').textContent = `机器人加了${add}`;
+            updateGameState();
+            
+            if (checkLoss()) {
+                gameOver(false);
+                return;
+            }
+            
+            isPlayerTurn = true;
+            document.getElementById('gameStatus').textContent = "玩家回合！";
+            document.getElementById('robotAction').textContent = `上一次机器人加了：${lastRobotAction}`;
+            updateButtonState();
+        }
+
+        function checkLoss() {
+            return currentNumber >= target;
+        }
+
+        function gameOver(isPlayer) {
+            gameActive = false;
+            updateButtonState();
+            document.getElementById('targetNumber').disabled = false;
+            document.getElementById('startButton').disabled = false;
+            document.getElementById('gameStatus').textContent = isPlayer ? 
+                "玩家输了！游戏结束！" : "机器人输了！你赢了！";
+            document.getElementById('robotAction').textContent = "";
+        }
+
+        function updateGameState() {
+            document.getElementById('currentNumber').textContent = `当前数字：${currentNumber}`;
+            updateButtonState();
+        }
+
+        function updateButtonState() {
+            const difference = target - currentNumber;
+            const btn1 = document.getElementById('btn1');
+            const btn2 = document.getElementById('btn2');
+            const btn3 = document.getElementById('btn3');
+
+            if (!gameActive) {
+                btn1.disabled = true;
+                btn2.disabled = true;
+                btn3.disabled = true;
+                return;
+            }
+
+            if (isPlayerTurn) {
+                btn1.disabled = false;
+                btn2.disabled = difference <= 1;
+                btn3.disabled = difference <= 2;
+            } else {
+                btn1.disabled = true;
+                btn2.disabled = true;
+                btn3.disabled = true;
+            }
+        }
+        
+        // 主题切换功能
+        const checkbox = document.getElementById('checkbox');
+        
+        checkbox.addEventListener('change', function() {
+            document.body.classList.toggle('dark-theme');
+        });
+    </script>
+</body>
+</html>

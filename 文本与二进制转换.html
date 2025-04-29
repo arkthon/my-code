@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本与二进制转换器</title>
+    <style>
+        /* 整体样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #eef2f8;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        /* 暗色主题 */
+        body.dark-theme {
+            background-color: #1f1f1f;
+            color: #f0f0f0;
+        }
+        
+        /* 页面标题 */
+        .site-header {
+            text-align: left;
+            padding: 20px 0 30px 0;
+        }
+        
+        .site-header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #333;
+        }
+        
+        body.dark-theme .site-header h1 {
+            color: #f0f0f0;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            padding: 25px;
+            margin: 0 auto;
+        }
+        
+        body.dark-theme .card {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        body.dark-theme .card-title {
+            color: #e0e0e0;
+        }
+        
+        /* 输入框 */
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            resize: vertical;
+            background-color: white;
+            color: #333;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        body.dark-theme textarea {
+            background-color: #3d3d3d;
+            border-color: #444;
+            color: #f0f0f0;
+        }
+        
+        textarea:focus {
+            border-color: #4096ff;
+            outline: none;
+        }
+        
+        /* 按钮样式 */
+        .action-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 500;
+            margin: 0 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: #2a7de1;
+        }
+        
+        .buttons-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        /* 结果区域 */
+        .output-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f8ff;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme .output-container {
+            background-color: #3d3d3d;
+            border-color: #444;
+        }
+        
+        .output {
+            font-size: 16px;
+            word-wrap: break-word;
+            color: #333;
+            line-height: 1.6;
+            padding-right: 50px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body.dark-theme .output {
+            color: #f0f0f0;
+        }
+        
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-button:hover {
+            background-color: #2a7de1;
+        }
+        
+        /* 主题切换开关 */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 40px;
+        }
+        
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-switch-label {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        body.dark-theme .theme-switch-label {
+            color: #cccccc;
+        }
+        
+        /* 返回按钮 */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4096ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover {
+            color: #2a7de1;
+        }
+        
+        body.dark-theme .back-link {
+            color: #5baeff;
+        }
+        
+        body.dark-theme .back-link:hover {
+            color: #8ac5ff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .action-btn {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 网站标题 -->
+    <header class="site-header">
+        <a href="../mycode.html" class="back-link">← 返回主页</a>
+        <h1>文本与二进制转换器</h1>
+    </header>
+    
+    <!-- 主要内容卡片 -->
+    <div class="card">
+        <div class="card-title">在下方输入文本或二进制内容</div>
+        <textarea id="inputText" placeholder="在此输入文本或二进制内容..."></textarea>
+        <div class="buttons-container">
+            <button class="action-btn" onclick="convertToBinary()">转为二进制</button>
+            <button class="action-btn" onclick="convertToText()">转为文本</button>
+        </div>
+        <div class="output-container">
+            <div class="output" id="output"></div>
+            <button class="copy-button" onclick="copyOutput()" title="复制">📋</button>
+        </div>
+        
+        <!-- 主题切换开关 -->
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+            <span class="theme-switch-label">切换主题</span>
+        </div>
+    </div>
+
+    <script>
+        function convertToBinary() {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) {
+                alert('请输入文本！');
+                return;
+            }
+
+            let binaryOutput = '';
+            for (let i = 0; i < input.length; i++) {
+                const charCode = input.charCodeAt(i);
+                if (charCode >= 0 && charCode <= 65535) { 
+                    const binary = charCode.toString(2).padStart(16, '0'); 
+                    binaryOutput += binary + ' '; 
+                } else {
+                    alert('输入包含无效字符，请检查后重试！');
+                    return;
+                }
+            }
+            document.getElementById('output').textContent = binaryOutput.trim();
+        }
+
+        function convertToText() {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) {
+                alert('请输入二进制文本！');
+                return;
+            }
+
+            const binaryArray = input.split(' ');
+            let textOutput = '';
+
+            for (let i = 0; i < binaryArray.length; i++) {
+                const binary = binaryArray[i];
+                if (binary) {
+                    const charCode = parseInt(binary, 2);
+                    if (!isNaN(charCode)) {
+                        textOutput += String.fromCharCode(charCode);
+                    } else {
+                        alert('输入包含无效的二进制数据，请检查后重试！');
+                        return;
+                    }
+                }
+            }
+
+            document.getElementById('output').textContent = textOutput;
+        }
+
+        function copyOutput() {
+            const outputText = document.getElementById('output').textContent;
+            if (!outputText) {
+                alert('没有内容可复制！');
+                return;
+            }
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(outputText)
+                    .then(() => alert('已复制到剪贴板！'))
+                    .catch(() => alert('复制失败，请手动复制。'));
+            } else {
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.value = outputText;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextarea);
+                alert('已复制到剪贴板！');
+            }
+        }
+        
+        // 主题切换功能
+        const checkbox = document.getElementById('checkbox');
+        
+        // 检查是否有保存的主题设置
+        if (localStorage.getItem('darkTheme') === 'true') {
+            document.body.classList.add('dark-theme');
+            checkbox.checked = true;
+        }
+        
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('darkTheme', 'true');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('darkTheme', 'false');
+            }
+        });
+    </script>
+</body>
+</html>

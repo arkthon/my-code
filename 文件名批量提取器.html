@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件名批量提取器</title>
+    <style>
+        /* 整体样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #eef2f8;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        /* 暗色主题 */
+        body.dark-theme {
+            background-color: #1f1f1f;
+            color: #f0f0f0;
+        }
+        
+        /* 页面标题 */
+        .site-header {
+            text-align: left;
+            padding: 20px 0 30px 0;
+        }
+        
+        .site-header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #333;
+        }
+        
+        body.dark-theme .site-header h1 {
+            color: #f0f0f0;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            padding: 25px;
+            margin: 0 auto;
+            transition: transform 0.2s;
+        }
+        
+        body.dark-theme .card {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        body.dark-theme .card-title {
+            color: #e0e0e0;
+        }
+        
+        /* 输入组 */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        /* 文件输入框 */
+        input[type="file"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            background-color: #f8fafd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+        
+        body.dark-theme input[type="file"] {
+            border-color: #444;
+            background-color: #3a3a3a;
+            color: #f0f0f0;
+        }
+        
+        input[type="file"]:hover {
+            border-color: #4096ff;
+        }
+        
+        /* 格式容器 */
+        .format-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* 文本输入框 */
+        #format {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: white;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme #format {
+            border-color: #444;
+            background-color: #3d3d3d;
+            color: #f0f0f0;
+        }
+        
+        #format:focus {
+            outline: none;
+            border-color: #4096ff;
+        }
+        
+        /* 按钮样式 */
+        .action-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .action-btn:hover {
+            background-color: #2a7de1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 结果区域 */
+        #result {
+            background-color: #f5f8ff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            margin-top: 20px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme #result {
+            background-color: #3d3d3d;
+            border-color: #444;
+            color: #f0f0f0;
+        }
+        
+        /* 复制按钮 */
+        .copy-btn {
+            margin-top: 15px;
+            width: 100%;
+            max-width: 200px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 25px;
+            border-radius: 100px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .message.error {
+            background-color: #ff4d4f;
+        }
+        
+        .message.success {
+            background-color: #52c41a;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        /* 主题切换开关 */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 40px;
+        }
+        
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-switch-label {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        body.dark-theme .theme-switch-label {
+            color: #cccccc;
+        }
+        
+        /* 返回按钮 */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4096ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover {
+            color: #2a7de1;
+        }
+        
+        body.dark-theme .back-link {
+            color: #5baeff;
+        }
+        
+        body.dark-theme .back-link:hover {
+            color: #8ac5ff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .format-container {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- 主要内容卡片 -->
+    <div class="card">
+        <div class="card-title">批量提取和格式化文件名</div>
+        
+        <div class="input-group">
+            <input type="file" id="fileInput" multiple>
+        </div>
+
+        <div class="format-container">
+            <input type="text" id="format" value="X" placeholder="输入格式（使用X作为占位符）">
+            <button class="action-btn" onclick="processFiles()">生成列表</button>
+        </div>
+
+        <div id="result"></div>
+        <button class="action-btn copy-btn" onclick="copyToClipboard()">复制结果</button>
+        
+        <!-- 主题切换开关 -->
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+            <span class="theme-switch-label">切换主题</span>
+        </div>
+    </div>
+
+    <script>
+        function processFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const format = document.getElementById('format').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!fileInput.files.length) {
+                showMessage("请先选择文件！", 'error');
+                return;
+            }
+
+            let output = "";
+            const files = Array.from(fileInput.files);
+
+            files.forEach(file => {
+                const fileName = file.name;
+                let line = format.replace(/X/g, fileName);
+                output += line + "\n";
+            });
+
+            resultDiv.textContent = output;
+        }
+
+        async function copyToClipboard() {
+            const result = document.getElementById('result').textContent;
+            if (!result) {
+                showMessage("没有内容可复制！", 'error');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(result);
+                showMessage("已复制到剪贴板！", 'success');
+            } catch (err) {
+                showMessage("复制失败，请手动选择复制", 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.createElement('div');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+        }
+
+        // 文件拖放支持
+        const card = document.querySelector('.card');
+        card.addEventListener('dragover', e => {
+            e.preventDefault();
+            card.style.transform = 'scale(1.01)';
+        });
+
+        card.addEventListener('dragleave', () => {
+            card.style.transform = 'scale(1)';
+        });
+
+        card.addEventListener('drop', e => {
+            e.preventDefault();
+            card.style.transform = 'scale(1)';
+            document.getElementById('fileInput').files = e.dataTransfer.files;
+        });
+        
+        // 主题切换功能
+        const checkbox = document.getElementById('checkbox');
+        
+        // 检查是否有保存的主题设置
+        if (localStorage.getItem('darkTheme') === 'true') {
+            document.body.classList.add('dark-theme');
+            checkbox.checked = true;
+        }
+        
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('darkTheme', 'true');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('darkTheme', 'false');
+            }
+        });
+    </script>
+</body>
+</html>

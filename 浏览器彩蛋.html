@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>浏览器彩蛋</title>
+    <style>
+        /* 整体样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #eef2f8;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        /* 暗色主题 */
+        body.dark-theme {
+            background-color: #1f1f1f;
+            color: #f0f0f0;
+        }
+        
+        /* 页面标题 */
+        .site-header {
+            text-align: left;
+            padding: 20px 0 30px 0;
+        }
+        
+        .site-header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #333;
+        }
+        
+        body.dark-theme .site-header h1 {
+            color: #f0f0f0;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        body.dark-theme .card {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        body.dark-theme .card-title {
+            color: #e0e0e0;
+        }
+        
+        /* 结果显示 */
+        #result {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        body.dark-theme #result {
+            color: #cccccc;
+        }
+        
+        /* 按钮样式 */
+        .action-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 500;
+            display: block;
+            margin: 0 auto 25px auto;
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        .action-btn:hover {
+            background-color: #2a7de1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 提示框样式 */
+        .alert-box {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            align-items: center;
+            background-color: #f5f8ff;
+            border-left: 4px solid #4096ff;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme .alert-box {
+            background-color: #3d3d3d;
+            border-color: #5baeff;
+        }
+        
+        .alert-box.visible {
+            display: flex;
+            animation: slideIn 0.4s ease forwards, floatEffect 3s infinite ease-in-out;
+        }
+        
+        .alert-box.info {
+            border-color: #4096ff;
+        }
+        
+        .alert-box.success {
+            border-color: #52c41a;
+        }
+        
+        .alert-box.warning {
+            border-color: #faad14;
+        }
+        
+        .alert-text {
+            flex: 1;
+            margin: 0 15px 0 5px;
+            word-break: break-all;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        body.dark-theme .alert-text {
+            color: #f0f0f0;
+        }
+        
+        .copy-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: #2a7de1;
+        }
+        
+        /* 动画效果 */
+        @keyframes slideIn {
+            from { 
+                transform: translateY(-20px); 
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0); 
+                opacity: 1;
+            }
+        }
+        
+        @keyframes floatEffect {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* 主题切换开关 */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 40px;
+        }
+        
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-switch-label {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        body.dark-theme .theme-switch-label {
+            color: #cccccc;
+        }
+        
+        /* 返回按钮 */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4096ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover {
+            color: #2a7de1;
+        }
+        
+        body.dark-theme .back-link {
+            color: #5baeff;
+        }
+        
+        body.dark-theme .back-link:hover {
+            color: #8ac5ff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 网站标题 -->
+    <header class="site-header">
+        <a href="../mycode.html" class="back-link">← 返回主页</a>
+        <h1>浏览器彩蛋</h1>
+    </header>
+    
+    <!-- 主要内容卡片 -->
+    <div class="card">
+        <div class="card-title">🎮 发现你的浏览器隐藏游戏</div>
+        <div id="result">正在识别你的设备...</div>
+        <button class="action-btn" onclick="activateEasterEgg()">立即游玩彩蛋</button>
+        
+        <div id="alertBox" class="alert-box">
+            <span class="alert-text" id="alertText"></span>
+            <button class="copy-btn" onclick="copyToClipboard()">复制</button>
+        </div>
+        
+        <!-- 主题切换开关 -->
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+            <span class="theme-switch-label">切换主题</span>
+        </div>
+    </div>
+
+    <script>
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            let browser = {
+                name: '未知浏览器',
+                isMobile: /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(ua)
+            };
+
+            const browserMap = {
+                'Edg': 'Microsoft Edge',
+                'Chrome': 'Google Chrome',
+                'Firefox': 'Mozilla Firefox',
+                'Safari': 'Apple Safari'
+            };
+
+            for (const [key, value] of Object.entries(browserMap)) {
+                if (ua.includes(key)) {
+                    browser.name = value;
+                    if (browser.isMobile) browser.name += ' Mobile';
+                    break;
+                }
+            }
+            return browser;
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertBox = document.getElementById('alertBox');
+            const alertText = document.getElementById('alertText');
+            alertText.textContent = message;
+            alertBox.className = `alert-box ${type} visible`;
+            
+            clearTimeout(window.alertTimeout);
+            window.alertTimeout = setTimeout(() => {
+                alertBox.className = 'alert-box';
+            }, 5000);
+        }
+
+        async function copyToClipboard() {
+            try {
+                const alertText = document.getElementById('alertText').textContent;
+                await navigator.clipboard.writeText(alertText);
+                showAlert('复制成功！', 'success');
+            } catch (err) {
+                showAlert('复制失败，请手动复制', 'warning');
+            }
+        }
+
+        function activateEasterEgg() {
+            const browser = detectBrowser();
+
+            if (browser.name.includes('Chrome') || browser.name.includes('Edge')) {
+                if (!browser.isMobile) {
+                    showAlert('在浏览器地址栏输入: chrome://dino 或者 断开网络连接后刷新页面', 'info');
+                } else {
+                    showAlert('在Chrome Mobile中，断开网络后刷新页面来玩恐龙游戏', 'info');
+                }
+            } else if (browser.name.includes('Firefox')) {
+                if (!browser.isMobile) {
+                    showAlert('在浏览器地址栏输入: about:robots', 'info');
+                } else {
+                    showAlert('Firefox Mobile没有明显的彩蛋游戏，可以尝试在地址栏输入about:robots看看其他彩蛋', 'info');
+                }
+            } else if (browser.name.includes('Safari')) {
+                showAlert('Safari没有专门的游戏彩蛋，但可以试试在 Spotlight 搜索"昭和平成令和"', 'info');
+            } else {
+                showAlert('无法确定你的浏览器，请尝试断开网络后刷新页面看是否有恐龙游戏', 'warning');
+            }
+        }
+
+        window.onload = function() {
+            const browser = detectBrowser();
+            document.getElementById('result').textContent = `已检测到你正在使用: ${browser.name}`;
+        };
+        
+        // 主题切换功能
+        const checkbox = document.getElementById('checkbox');
+        
+        // 检查是否有保存的主题设置
+        if (localStorage.getItem('darkTheme') === 'true') {
+            document.body.classList.add('dark-theme');
+            checkbox.checked = true;
+        }
+        
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('darkTheme', 'true');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('darkTheme', 'false');
+            }
+        });
+    </script>
+</body>
+</html>

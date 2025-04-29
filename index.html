@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的主页</title>
+    <style>
+        /* 整体样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #eef2f8;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+        }
+        
+        /* 暗色主题 */
+        body.dark-theme {
+            background-color: #1f1f1f;
+            color: #f0f0f0;
+        }
+        
+        body.dark-theme .card {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.dark-theme .card-title {
+            color: #e0e0e0;
+        }
+        
+        body.dark-theme .timer {
+            color: #cccccc;
+        }
+        
+        body.dark-theme .site-header h1 {
+            color: #f0f0f0;
+        }
+        
+        body.dark-theme .theme-switch-label {
+            color: #cccccc;
+        }
+        
+        /* 暗色主题下渣男绿茶卡片样式 */
+        body.dark-theme #sweet-text-container {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+        }
+        
+        body.dark-theme .card .text-muted {
+            color: #aaaaaa !important;
+        }
+        
+        /* 页面标题 */
+        .site-header {
+            text-align: left;
+            padding: 20px 0 40px 0;
+        }
+        
+        .site-header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #333;
+        }
+        
+        /* 卡片容器 */
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+        }
+        
+        /* 单个卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .timer {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        /* 平台按钮样式 */
+        .platform-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .platform-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 10px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .platform-btn:hover {
+            background-color: #2a7de1;
+        }
+        
+        /* 游戏按钮网格 */
+        .games-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .game-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .game-btn:hover {
+            background-color: #2a7de1;
+        }
+        
+        /* 小工具按钮样式 */
+        .tools-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .tool-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            min-width: 140px;
+            text-align: center;
+        }
+        
+        .tool-btn.wide {
+            min-width: 200px;
+        }
+        
+        .tool-btn:hover {
+            background-color: #2a7de1;
+        }
+        
+        /* 主题切换开关 */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-switch-label {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 网站标题 -->
+    <header class="site-header">
+        <h1>我的主页</h1>
+    </header>
+    
+    <!-- 卡片容器 -->
+    <div class="cards-container">
+        <!-- 运行时间卡片 -->
+        <div class="card">
+            <div class="card-title">网站稳如老狗的运行了</div>
+            <div class="timer" id="running-time">58天7小时35分钟17秒</div>
+        </div>
+        
+        <!-- 平台卡片 -->
+        <div class="card">
+            <div class="card-title">我所在的平台</div>
+            <div class="platform-buttons">
+                <a href="https://www.douyin.com/user/MS4wLjABAAAA8U_l6rBzmy7bcy6xOJel4v0RzoR_wfAubGPeJimN__4?enter_from=general_search&enter_method=general_search&extra_params=%7B%22search_params%22%3A%7B%22search_result_id%22%3A%22104255897823%22%2C%22relation_tag%22%3A1%2C%22log_pb%22%3A%7B%22impr_id%22%3A%2220250428130944F8C5566936598E384F21%22%7D%2C%22search_type%22%3A%22general%22%2C%22impr_id%22%3A%2220250428130944F8C5566936598E384F21%22%2C%22search_id%22%3A%2220250428130944F8C5566936598E384F21%22%2C%22search_keyword%22%3A%22%E4%BA%BA%E6%B0%91%E6%97%A5%E6%8A%A5%22%2C%22token_type%22%3A%22discover_list%22%7D%7D&from_tab_name=main" target="_blank" class="platform-btn">抖音主页</a>
+                <a href="https://space.bilibili.com/3546717282634121?spm_id_from=333.1007.0.0" target="_blank" class="platform-btn">B站主页</a>
+            </div>
+        </div>
+        
+        <!-- 小游戏卡片 -->
+        <div class="card">
+            <div class="card-title">小游戏</div>
+            <div class="games-grid">
+                <a href="推箱子.html" class="game-btn">推箱子</a>
+                <a href="贪吃蛇.html" class="game-btn">贪吃蛇</a>
+                <a href="Math.html" class="game-btn">数字游戏</a>
+                <a href="井字棋.html" class="game-btn">井字棋</a>
+                <a href="扫雷.html" class="game-btn">扫雷</a>
+                <a href="http://www.staggeringbeauty.com/" class="game-btn">飘动的鳗鱼</a>
+            </div>
+        </div>
+        
+        <!-- 资源网站推荐卡片 -->
+        <div class="card">
+            <div class="card-title">推荐资源网站</div>
+            <div class="tools-grid">
+                <a href="https://flingtrainer.com/" class="tool-btn">风灵月影修改器</a>
+                <a href="https://poki.com/zh" class="tool-btn">小游戏</a>
+                <a href="https://store.steampowered.com/" class="tool-btn">Steam</a>
+            </div>
+        </div>
+        
+        <!-- 小玩意卡片 -->
+        <div class="card">
+            <div class="card-title">我的小工具</div>
+            <div class="tools-grid">
+                <a href="HTML代码运行器.html" class="tool-btn">HTML代码运行器</a>
+                <a href="字数计算器.html" class="tool-btn">字数计算器</a>
+                <a href="北京时间.html" class="tool-btn">北京时间</a>
+                <a href="文本转二维码.html" class="tool-btn">文本转二维码</a>
+                <a href="文本与二进制转换.html" class="tool-btn">文本与二进制转换</a>
+                <a href="音频变速工具.html" class="tool-btn">音频变速工具</a>
+                <a href="浏览器彩蛋.html" class="tool-btn">浏览器彩蛋</a>
+                <a href="视频转字符动画.html" class="tool-btn">视频转字符动画</a>
+                <a href="文件名批量提取器.html" class="tool-btn wide">文件名批量提取器</a>
+                <a href="AI聊天.html" class="tool-btn wide">AI聊天</a>
+            </div>
+            
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider"></div>
+                </label>
+                <span class="theme-switch-label">切换主题</span>
+            </div>
+        </div>
+        <!-- 未来可添加更多卡片 -->
+    </div>
+
+    <script>
+        
+        const now = new Date();
+        const startTime = new Date('2025-04-28').getTime(); 
+        
+        // 更新运行时间的函数
+        function updateRunningTime() {
+            const currentTime = new Date().getTime();
+            const difference = currentTime - startTime;
+            
+            // 计算天数、小时、分钟和秒数
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            
+            // 更新显示
+            document.getElementById('running-time').textContent = 
+                `${days}天${hours}小时${minutes}分${seconds}秒`;
+        }
+        
+        // 页面加载完成后立即更新一次
+        updateRunningTime();
+        
+        // 每秒更新一次
+        setInterval(updateRunningTime, 1000);
+        
+        // 主题切换功能
+        const checkbox = document.getElementById('checkbox');
+        
+        checkbox.addEventListener('change', function() {
+            document.body.classList.toggle('dark-theme');
+        });
+        
+        
+        // 初始化加载
+        getSweetNothings(currentGenderType);
+        
+        // 点击事件处理
+        maleBtn.addEventListener('click', () => {
+            currentGenderType = 'M';
+            getSweetNothings(currentGenderType);
+            
+            // 更新按钮样式
+            maleBtn.style.backgroundColor = '#4096ff';
+            femaleBtn.style.backgroundColor = '#ff6b9a';
+        });
+        
+        femaleBtn.addEventListener('click', () => {
+            currentGenderType = 'F';
+            getSweetNothings(currentGenderType);
+            
+            // 更新按钮样式
+            maleBtn.style.backgroundColor = '#92afd7';
+            femaleBtn.style.backgroundColor = '#ff4081';
+        });
+        
+        refreshBtn.addEventListener('click', () => {
+            getSweetNothings(currentGenderType);
+        });
+    </script>
+</body>
+</html> 

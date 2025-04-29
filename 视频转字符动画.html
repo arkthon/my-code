@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频转字符动画</title>
+    <style>
+        /* 整体样式 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #eef2f8;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        /* 暗色主题 */
+        body.dark-theme {
+            background-color: #1f1f1f;
+            color: #f0f0f0;
+        }
+        
+        /* 页面标题 */
+        .site-header {
+            text-align: left;
+            padding: 20px 0 30px 0;
+        }
+        
+        .site-header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #333;
+        }
+        
+        body.dark-theme .site-header h1 {
+            color: #f0f0f0;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            padding: 25px;
+            margin: 0 auto;
+        }
+        
+        body.dark-theme .card {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        body.dark-theme .card-title {
+            color: #e0e0e0;
+        }
+        
+        /* 说明文本 */
+        #description {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        body.dark-theme #description {
+            color: #aaa;
+        }
+        
+        #description a {
+            color: #4096ff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        #description a:hover {
+            color: #2a7de1;
+            text-decoration: underline;
+        }
+        
+        body.dark-theme #description a {
+            color: #5baeff;
+        }
+        
+        body.dark-theme #description a:hover {
+            color: #8ac5ff;
+        }
+        
+        /* 输入组 */
+        .input-group {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8fafd;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme .input-group {
+            background-color: #3a3a3a;
+            border-color: #444;
+        }
+        
+        .input-group:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        body.dark-theme .input-group:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        body.dark-theme label {
+            color: #e0e0e0;
+        }
+        
+        input[type="file"], input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background-color: white;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-theme input[type="file"], 
+        body.dark-theme input[type="number"], 
+        body.dark-theme input[type="text"] {
+            border-color: #444;
+            background-color: #3d3d3d;
+            color: #f0f0f0;
+        }
+        
+        input[type="file"]:focus, 
+        input[type="number"]:focus, 
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4096ff;
+        }
+        
+        /* 按钮样式 */
+        .action-btn {
+            background-color: #4096ff;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: block;
+            margin: 25px auto;
+            min-width: 180px;
+        }
+        
+        .action-btn:hover {
+            background-color: #2a7de1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn:active {
+            transform: translateY(0);
+        }
+        
+        .action-btn:disabled {
+            background-color: #b0d0ff;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        body.dark-theme .action-btn:disabled {
+            background-color: #3a6592;
+        }
+        
+        /* 进度和下载 */
+        #progress {
+            margin: 15px 0;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        body.dark-theme #progress {
+            color: #aaa;
+        }
+        
+        #downloadLink {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            padding: 12px 25px;
+            background-color: #52c41a;
+            color: white;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            max-width: 250px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        #downloadLink:hover {
+            background-color: #389e0d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 预览区域 */
+        #preview {
+            white-space: pre;
+            font-family: monospace;
+            margin-top: 20px;
+            background-color: #000;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+            max-height: 400px;
+        }
+        
+        /* 主题切换开关 */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 40px;
+        }
+        
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-switch-label {
+            margin-left: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        body.dark-theme .theme-switch-label {
+            color: #cccccc;
+        }
+        
+        /* 返回按钮 */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4096ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover {
+            color: #2a7de1;
+        }
+        
+        body.dark-theme .back-link {
+            color: #5baeff;
+        }
+        
+        body.dark-theme .back-link:hover {
+            color: #8ac5ff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 网站标题 -->
+    <header class="site-header">
+        <a href="../mycode.html" class="back-link">← 返回主页</a>
+        <h1>视频转字符动画</h1>
+    </header>
+    
+    <!-- 主要内容卡片 -->
+    <div class="card">
+        <div class="card-title">将视频转换为字符动画</div>
+        <p id="description">本工具生成的是Python脚本，需要安装<a href="https://www.python.org/" target="_blank">Python</a>运行</p>
+        
+        <div class="input-group">
+            <label>选择视频文件：</label>
+            <input type="file" id="videoInput" accept="video/*">
+        </div>
+
+        <div class="input-group">
+            <label>输出宽度（字符数，建议80-120）：</label>
+            <input type="number" id="outputWidth" value="80">
+        </div>
+
+        <div class="input-group">
+            <label>帧率（FPS，建议5-15）：</label>
+            <input type="number" id="fps" value="10">
+        </div>
+
+        <div class="input-group">
+            <label>字符集（从暗到亮排列）：</label>
+            <input type="text" id="chars" value=".:-=+*#%@">
+        </div>
+
+        <button id="convertBtn" class="action-btn" onclick="processVideo()">开始转换</button>
+        
+        <div id="progress"></div>
+        <a id="downloadLink" style="display: none;">下载Python脚本</a>
+        
+        <!-- 主题切换开关 -->
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+            <span class="theme-switch-label">切换主题</span>
+        </div>
+    </div>
+
+    <script>
+        const controls = [
+            'videoInput', 
+            'outputWidth',
+            'fps',
+            'chars',
+            'convertBtn'
+        ];
+
+        function disableControls() {
+            controls.forEach(id => {
+                const el = document.getElementById(id);
+                el.disabled = true;
+                el.style.pointerEvents = 'none';
+            });
+        }
+
+        function enableControls() {
+            controls.forEach(id => {
+                const el = document.getElementById(id);
+                el.disabled = false;
+                el.style.pointerEvents = 'auto';
+            });
+        }
+
+        function processVideo() {
+            disableControls();
+            
+            try {
+                const file = document.getElementById('videoInput').files[0];
+                if (!file) {
+                    alert('请先选择视频文件');
+                    enableControls();
+                    return;
+                }
+                
+                const outputWidth = parseInt(document.getElementById('outputWidth').value) || 80;
+                const fps = parseInt(document.getElementById('fps').value) || 10;
+                const chars = document.getElementById('chars').value || '.:-=+*#%@';
+                
+                document.getElementById('progress').textContent = '正在处理视频...';
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const videoBlob = e.target.result;
+                    
+                    // 创建视频元素来获取尺寸
+                    const videoElement = document.createElement('video');
+                    videoElement.preload = 'metadata';
+                    videoElement.style.display = 'none';
+                    document.body.appendChild(videoElement);
+                    
+                    videoElement.onloadedmetadata = function() {
+                        document.body.removeChild(videoElement);
+                        
+                        const width = videoElement.videoWidth;
+                        const height = videoElement.videoHeight;
+                        const duration = videoElement.duration;
+                        const totalFrames = Math.floor(duration * fps);
+                        
+                        // 计算输出高度，保持视频比例
+                        const outputHeight = Math.floor(outputWidth * (height / width));
+                        
+                        document.getElementById('progress').textContent = 
+                            `处理完成！视频信息：${width}x${height}, ${duration.toFixed(1)}秒, ${totalFrames}帧`;
+                        
+                        // 生成Python脚本
+                        const scriptContent = generatePythonScript(file.name, outputWidth, outputHeight, fps, chars);
+                        
+                        // 创建下载链接
+                        createDownloadLink(scriptContent, file.name);
+                    };
+                    
+                    videoElement.src = URL.createObjectURL(new Blob([videoBlob]));
+                };
+                
+                reader.readAsArrayBuffer(file);
+            } catch (error) {
+                document.getElementById('progress').textContent = '处理失败: ' + error.message;
+                enableControls();
+            }
+        }
+
+        function generatePythonScript(filename, width, height, fps, chars) {
+            return `
+import cv2
+import time
+import os
+
+# 输入参数
+VIDEO_PATH = "${filename}"  # 视频文件路径
+OUTPUT_WIDTH = ${width}     # 输出宽度（字符数）
+OUTPUT_HEIGHT = ${height}   # 输出高度（字符数）
+FPS = ${fps}                # 帧率
+CHARS = "${chars}"          # 字符集，从暗到亮
+CLEAR_CMD = "cls" if os.name == "nt" else "clear"  # Windows使用cls，Unix使用clear
+
+# 打开视频
+cap = cv2.VideoCapture(VIDEO_PATH)
+if not cap.isOpened():
+    print(f"无法打开视频: {VIDEO_PATH}")
+    exit(1)
+
+# 获取视频信息
+video_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+video_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+video_fps = cap.get(cv2.CAP_PROP_FPS)
+total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+print(f"视频信息: {video_width}x{video_height}, {video_fps}fps, {total_frames}帧")
+print(f"输出尺寸: {OUTPUT_WIDTH}x{OUTPUT_HEIGHT}字符")
+print(f"播放帧率: {FPS}fps")
+print("按Ctrl+C停止播放")
+time.sleep(2)  # 给用户时间阅读信息
+
+frame_time = 1.0 / FPS  # 每帧显示时间
+
+try:
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            # 视频播放完毕，重新开始
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            continue
+        
+        # 调整帧大小
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        resized = cv2.resize(gray, (OUTPUT_WIDTH, OUTPUT_HEIGHT))
+        
+        # 清屏
+        os.system(CLEAR_CMD)
+        
+        # 将像素转换为字符并显示
+        ascii_frame = ""
+        for y in range(OUTPUT_HEIGHT):
+            for x in range(OUTPUT_WIDTH):
+                # 归一化像素值到字符索引
+                pixel_value = resized[y, x]
+                char_index = int(pixel_value * (len(CHARS) - 1) / 255)
+                ascii_frame += CHARS[char_index]
+            ascii_frame += "\\n"
+        
+        print(ascii_frame)
+        
+        # 控制帧率
+        time.sleep(frame_time)
+
+except KeyboardInterrupt:
+    print("播放结束")
+
+# 释放资源
+cap.release()
+`;
+        }
+
+        function createDownloadLink(scriptContent, originalFilename) {
+            const blob = new Blob([scriptContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = url;
+            
+            // 修改文件名，保留原始文件名但改为.py扩展名
+            const baseName = originalFilename.substring(0, originalFilename.lastIndexOf('.')) || originalFilename;
+            downloadLink.download = `${baseName}_ascii.py`;
+            downloadLink.style.display = 'block';
+            downloadLink.textContent = '下载Python脚本';
+            
+            enableControls();
+        }
+        
+        // 主题切换功能
+        const checkbox = document.getElementById('checkbox');
+        
+        // 检查是否有保存的主题设置
+        if (localStorage.getItem('darkTheme') === 'true') {
+            document.body.classList.add('dark-theme');
+            checkbox.checked = true;
+        }
+        
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('darkTheme', 'true');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('darkTheme', 'false');
+            }
+        });
+    </script>
+</body>
+</html>

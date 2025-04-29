@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推箱子</title>
+    <style>
+        :root {
+            --bg-gradient-start: #f5f7fa;
+            --bg-gradient-end: #c3cfe2;
+            --game-container-bg: rgba(255,255,255,0.9);
+            --cell-bg: #fff;
+            --player-bg: #FFD700;
+            --box-bg: #FF6B6B;
+            --target-bg: #77DD77;
+            --control-bg: #4CAF50;
+            --text-color: #333;
+            --button-bg: #6c5ce7;
+            --button-hover: #5649c1;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-gradient-start: #2c3e50;
+                --bg-gradient-end: #3498db;
+                --game-container-bg: rgba(0,0,0,0.8);
+                --cell-bg: #2d3436;
+                --player-bg: #f1c40f;
+                --box-bg: #e74c3c;
+                --target-bg: #27ae60;
+                --control-bg: #2ecc71;
+                --text-color: #ecf0f1;
+                --button-bg: #6c5ce7;
+                --button-hover: #5649c1;
+            }
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            background: var(--game-container-bg);
+            padding: 8px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            gap: 3px;
+            margin: 10px 0;
+            padding: 15px;
+            background: var(--game-container-bg);
+            border-radius: 16px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background: var(--cell-bg);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: var(--text-color);
+        }
+
+        .player {
+            background: var(--player-bg);
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .box {
+            background: var(--box-bg);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .box-moving {
+            animation: boxmove 0.15s ease-out;
+        }
+        
+        @keyframes boxmove {
+            0% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .target {
+            background: var(--target-bg);
+        }
+
+        .box-on-target {
+            background: var(--target-bg);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--target-bg);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-areas:
+                ". up ."
+                "left center right"
+                ". down .";
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+            background: var(--game-container-bg);
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            margin: 10px 0 20px;
+        }
+
+        .controls button {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            background: var(--control-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .controls .up {
+            grid-area: up;
+        }
+
+        .controls .left {
+            grid-area: left;
+        }
+
+        .controls .center {
+            grid-area: center;
+            background: transparent;
+            border: 2px solid var(--control-bg);
+            border-radius: 50%;
+        }
+
+        .controls .down {
+            grid-area: down;
+        }
+
+        .controls .right {
+            grid-area: right;
+        }
+
+        .controls button:active {
+            transform: scale(0.95);
+            filter: brightness(0.9);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        
+        .level-select {
+            margin-top: 10px;
+            background: var(--game-container-bg);
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .level-select select {
+            padding: 5px;
+            border-radius: 5px;
+            margin: 0 10px;
+            background: var(--cell-bg);
+            color: var(--text-color);
+            border: 1px solid #ccc;
+        }
+        
+        .win-animation {
+            animation: celebrateWin 1s;
+        }
+        
+        @keyframes celebrateWin {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                grid-template-columns: repeat(8, 40px);
+                grid-template-rows: repeat(8, 40px);
+            }
+            .cell {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            .controls button {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: var(--game-container-bg);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 320px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .modal h2 {
+            margin-top: 0;
+            color: var(--text-color);
+        }
+        
+        .score {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        
+        .modal .btn {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-header">
+        <div class="stats">
+            <div>关卡: <span id="level">1</span></div>
+            <div>步数: <span id="moves">0</span></div>
+            <div>箱子: <span id="boxes-completed">0</span>/<span id="total-boxes">3</span></div>
+        </div>
+        <div class="action-buttons">
+            <button class="btn" onclick="resetLevel()">重置</button>
+            <button class="btn" onclick="undoMove()">撤销</button>
+        </div>
+    </div>
+    
+    <div class="game-container" id="game-container"></div>
+    
+    <div class="controls">
+        <button class="up" onclick="movePlayer(0, -1)">↑</button>
+        <button class="left" onclick="movePlayer(-1, 0)">←</button>
+        <button class="center"></button>
+        <button class="down" onclick="movePlayer(0, 1)">↓</button>
+        <button class="right" onclick="movePlayer(1, 0)">→</button>
+    </div>
+    
+    <div class="level-select">
+        <span>难度选择:</span>
+        <select id="difficulty" onchange="changeDifficulty()">
+            <option value="easy">简单</option>
+            <option value="medium" selected>中等</option>
+            <option value="hard">困难</option>
+        </select>
+    </div>
+    
+    <div id="win-modal" class="modal">
+        <div class="modal-content win-animation">
+            <h2>恭喜通关！</h2>
+            <div class="score">你用了 <span id="final-moves">0</span> 步完成了关卡</div>
+            <button class="btn" onclick="nextLevel()">下一关</button>
+        </div>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const levelElement = document.getElementById('level');
+        const movesElement = document.getElementById('moves');
+        const boxesCompletedElement = document.getElementById('boxes-completed');
+        const totalBoxesElement = document.getElementById('total-boxes');
+        const winModal = document.getElementById('win-modal');
+        const finalMovesElement = document.getElementById('final-moves');
+        
+        let map = [];
+        let player = { x: 0, y: 0 };
+        let boxes = [];
+        let targets = [];
+        let currentLevel = 1;
+        let moves = 0;
+        let difficulty = 'medium';
+        let gameHistory = [];
+        let audioContext;
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp': 
+                    movePlayer(0, -1);
+                    e.preventDefault();
+                    break;
+                case 'ArrowDown': 
+                    movePlayer(0, 1);
+                    e.preventDefault();
+                    break;
+                case 'ArrowLeft': 
+                    movePlayer(-1, 0);
+                    e.preventDefault();
+                    break;
+                case 'ArrowRight': 
+                    movePlayer(1, 0);
+                    e.preventDefault();
+                    break;
+                case 'r': 
+                    resetLevel();
+                    e.preventDefault();
+                    break;
+                case 'z':
+                    if (e.ctrlKey) undoMove();
+                    e.preventDefault();
+                    break;
+            }
+        });
+
+        function initGame() {
+            moves = 0;
+            movesElement.textContent = moves;
+            levelElement.textContent = currentLevel;
+            gameHistory = [];
+            
+            generateRandomMap();
+            renderMap();
+        }
+
+        function generateRandomMap() {
+            map = Array.from({ length: 8 }, () => Array(8).fill(0));
+            boxes = [];
+            targets = [];
+            
+            // 根据难度设置障碍物和箱子数量
+            let obstacleCount, numBoxes;
+            switch(difficulty) {
+                case 'easy':
+                    obstacleCount = 4;
+                    numBoxes = 2;
+                    break;
+                case 'hard':
+                    obstacleCount = 8;
+                    numBoxes = 4;
+                    break;
+                default: // medium
+                    obstacleCount = 6;
+                    numBoxes = 3;
+            }
+            
+            totalBoxesElement.textContent = numBoxes;
+            
+            // 放置障碍物
+            while (obstacleCount > 0) {
+                const x = Math.floor(Math.random() * 6) + 1;
+                const y = Math.floor(Math.random() * 6) + 1;
+                if (map[y][x] === 0) {
+                    map[y][x] = 1;
+                    obstacleCount--;
+                }
+            }
+            
+            // 放置玩家
+            player.x = Math.floor(Math.random() * 6) + 1;
+            player.y = Math.floor(Math.random() * 6) + 1;
+            map[player.y][player.x] = 0;
+            
+            // 放置目标点
+            for (let i = 0; i < numBoxes; i++) {
+                let targetX, targetY;
+                do {
+                    targetX = Math.floor(Math.random() * 6) + 1;
+                    targetY = Math.floor(Math.random() * 6) + 1;
+                } while (map[targetY][targetX] !== 0 || (targetX === player.x && targetY === player.y) || isPositionOccupied(targetX, targetY, targets) || isTargetBlocked(targetX, targetY));
+                targets.push({ x: targetX, y: targetY });
+            }
+            
+            // 放置箱子
+            for (let i = 0; i < numBoxes; i++) {
+                let boxX, boxY;
+                do {
+                    boxX = Math.floor(Math.random() * 6) + 1;
+                    boxY = Math.floor(Math.random() * 6) + 1;
+                } while (map[boxY][boxX] !== 0 || (boxX === player.x && boxY === player.y) || isBoxSurrounded(boxX, boxY) || isBoxOnTarget(boxX, boxY) || isBoxTwoSidesBlocked(boxX, boxY) || isPositionOccupied(boxX, boxY, boxes));
+                boxes.push({ x: boxX, y: boxY });
+            }
+        }
+
+        function isPositionOccupied(x, y, positions) {
+            return positions.some(pos => pos.x === x && pos.y === y);
+        }
+
+        function isTargetBlocked(x, y) {
+            const directions = [ { dx: -1, dy: 0 }, { dx: 1, dy: 0 }, { dx: 0, dy: -1 }, { dx: 0, dy: 1 } ];
+            let count = 0;
+            for (const dir of directions) {
+                const newX = x + dir.dx;
+                const newY = y + dir.dy;
+                if (newX < 0 || newX >= 8 || newY < 0 || newY >= 8 || map[newY][newX] === 1) count++;
+            }
+            return count > 1;
+        }
+
+        function isBoxSurrounded(x, y) {
+            const directions = [ { dx: -1, dy: 0 }, { dx: 1, dy: 0 }, { dx: 0, dy: -1 }, { dx: 0, dy: 1 } ];
+            let count = 0;
+            for (const dir of directions) {
+                const newX = x + dir.dx;
+                const newY = y + dir.dy;
+                if (newX < 0 || newX >= 8 || newY < 0 || newY >= 8 || map[newY][newX] === 1 || boxes.some(box => box.x === newX && box.y === newY)) count++;
+            }
+            return count >= 3;
+        }
+
+        function isBoxOnTarget(x, y) {
+            return targets.some(target => target.x === x && target.y === y);
+        }
+
+        function isBoxTwoSidesBlocked(x, y) {
+            const directions = [ { dx: -1, dy: 0 }, { dx: 1, dy: 0 }, { dx: 0, dy: -1 }, { dx: 0, dy: 1 } ];
+            let count = 0;
+            for (const dir of directions) {
+                const newX = x + dir.dx;
+                const newY = y + dir.dy;
+                if (newX < 0 || newX >= 8 || newY < 0 || newY >= 8 || map[newY][newX] === 1) count++;
+            }
+            return count >= 2;
+        }
+
+        function renderMap() {
+            gameContainer.innerHTML = '';
+            for (let y = 0; y < 8; y++) {
+                for (let x = 0; x < 8; x++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    
+                    // 障碍物
+                    if (map[y][x] === 1) cell.style.backgroundColor = '#a0a0a0';
+                    
+                    // 目标点
+                    let isTarget = false;
+                    targets.forEach(target => {
+                        if (target.x === x && target.y === y) {
+                            cell.classList.add('target');
+                            isTarget = true;
+                        }
+                    });
+                    
+                    // 箱子
+                    let hasBox = false;
+                    boxes.forEach(box => {
+                        if (box.x === x && box.y === y) {
+                            hasBox = true;
+                            if (isTarget) {
+                                cell.classList.add('box-on-target');
+                                cell.textContent = '✓';
+                            } else {
+                                cell.classList.add('box');
+                                cell.textContent = '📦';
+                            }
+                        }
+                    });
+                    
+                    // 玩家
+                    if (player.x === x && player.y === y) {
+                        cell.classList.add('player');
+                        cell.textContent = '😊';
+                    }
+                    
+                    gameContainer.appendChild(cell);
+                }
+            }
+            
+            // 更新已完成的箱子数量
+            const completedBoxes = boxes.filter(box => 
+                targets.some(target => target.x === box.x && target.y === box.y)
+            ).length;
+            
+            boxesCompletedElement.textContent = completedBoxes;
+        }
+
+        function checkWin() {
+            return boxes.every(box => targets.some(target => target.x === box.x && target.y === box.y));
+        }
+
+        function movePlayer(dx, dy) {
+            // 保存游戏状态用于撤销
+            const gameState = {
+                player: { ...player },
+                boxes: JSON.parse(JSON.stringify(boxes)),
+                moves: moves
+            };
+            
+            const newX = player.x + dx;
+            const newY = player.y + dy;
+            
+            // 检查是否能移动
+            if (newX < 0 || newX >= 8 || newY < 0 || newY >= 8 || map[newY][newX] === 1) return;
+            
+            // 查找是否有箱子
+            const boxIndex = boxes.findIndex(box => box.x === newX && box.y === newY);
+            if (boxIndex !== -1) {
+                const newBoxX = newX + dx;
+                const newBoxY = newY + dy;
+                
+                // 检查箱子是否可以推动
+                if (newBoxX < 0 || newBoxX >= 8 || newBoxY < 0 || newBoxY >= 8 || map[newBoxY][newBoxX] === 1) return;
+                if (boxes.some(box => box.x === newBoxX && box.y === newBoxY)) return;
+                
+                // 移动箱子
+                boxes[boxIndex].x = newBoxX;
+                boxes[boxIndex].y = newBoxY;
+                
+                playSound('move');
+            }
+            
+            // 移动玩家
+            player.x = newX;
+            player.y = newY;
+            
+            // 记录移动
+            moves++;
+            movesElement.textContent = moves;
+            gameHistory.push(gameState);
+            
+            // 重新渲染地图
+            renderMap();
+            
+            // 检查胜利
+            if (checkWin()) {
+                finalMovesElement.textContent = moves;
+                winModal.style.display = 'flex';
+                playSound('win');
+            }
+        }
+        
+        function resetLevel() {
+            initGame();
+            playSound('reset');
+        }
+        
+        function undoMove() {
+            if (gameHistory.length === 0) return;
+            
+            const previousState = gameHistory.pop();
+            player = { ...previousState.player };
+            boxes = JSON.parse(JSON.stringify(previousState.boxes));
+            moves = previousState.moves;
+            movesElement.textContent = moves;
+            
+            renderMap();
+            playSound('undo');
+        }
+        
+        function nextLevel() {
+            currentLevel++;
+            levelElement.textContent = currentLevel;
+            winModal.style.display = 'none';
+            initGame();
+            playSound('next');
+        }
+        
+        function changeDifficulty() {
+            difficulty = document.getElementById('difficulty').value;
+            resetLevel();
+        }
+        
+        function playSound(type) {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                let oscillator = audioContext.createOscillator();
+                let gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                switch(type) {
+                    case 'move':
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        oscillator.start();
+                        oscillator.stop(audioContext.currentTime + 0.1);
+                        break;
+                    case 'win':
+                        oscillator.type = 'triangle';
+                        oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        oscillator.start();
+                        
+                        setTimeout(() => {
+                            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.2); // E5
+                        }, 200);
+                        
+                        setTimeout(() => {
+                            oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.4); // G5
+                        }, 400);
+                        
+                        oscillator.stop(audioContext.currentTime + 0.8);
+                        break;
+                    case 'reset':
+                    case 'undo':
+                        oscillator.type = 'sine';
+                        oscillator.frequency.setValueAtTime(330, audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        oscillator.start();
+                        oscillator.stop(audioContext.currentTime + 0.1);
+                        break;
+                    case 'next':
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        oscillator.start();
+                        
+                        setTimeout(() => {
+                            oscillator.frequency.setValueAtTime(587.33, audioContext.currentTime + 0.15);
+                        }, 150);
+                        
+                        oscillator.stop(audioContext.currentTime + 0.3);
+                        break;
+                }
+            } catch (e) {
+                console.log('音频播放失败:', e);
+            }
+        }
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>
