@@ -3,49 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>单词消消乐</title>
+    <title>单词消消乐 - 魔法书房</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <!-- 标题，contenteditable="true" 允许用户直接点击编辑 -->
-            <h1 id="main-title" contenteditable="true" title="点击可修改标题">单词消消乐</h1>
-        </header>
+<div class="container">
+    <header>
+        <h1 id="main-title" contenteditable="true" title="点击可修改标题">魔法消消乐</h1>
+    </header>
 
-        <nav class="menu">
-            <div class="slider-container">
-                <label for="pair-slider">单词数量：<span id="slider-value">10</span> 对</label>
-                <input type="range" id="pair-slider" min="5" max="50" value="10">
-            </div>
-            <button id="import-btn" class="menu-btn">【导入词表】</button>
-            <input type="file" id="file-input" accept=".xlsx, .xls" style="display: none;">
-            <button id="start-btn" class="menu-btn">【开始游戏】</button>
-        </nav>
-
-        <div id="timer-display" class="timer">耗时：0 秒</div>
-
-        <main id="game-board"></main>
-
-    </div>
-
-    <!-- 游戏胜利后的模态框 -->
-    <div id="win-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h2>挑战成功！</h2>
-            <p id="win-time"></p>
-            <button id="continue-btn" class="modal-btn">【继续挑战】</button>
+    <nav class="menu">
+        <div class="slider-container">
+            <label for="pair-slider">魔法印记：<span id="slider-value">10</span> 对</label>
+            <input type="range" id="pair-slider" min="5" max="50" value="10">
         </div>
-    </div>
 
-    <!-- 引入 Excel 解析库 -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <!-- 引入我们的逻辑脚本 -->
-    <script src="script.js"></script>
+        <!-- 修改后的按钮结构 -->
+        <button id="import-btn" class="menu-btn">
+            <span class="icon"><!-- 导入图标将通过 CSS 添加 --></span>
+            <span class="text">导入魔咒</span>
+        </button>
+        <input type="file" id="file-input" accept=".xlsx, .xls" style="display: none;">
+
+        <button id="start-btn" class="menu-btn">
+            <span class="icon"><!-- 开始图标将通过 CSS 添加 --></span>
+            <span class="text">开始试炼</span>
+        </button>
+    </nav>
+
+    <div id="timer-display" class="timer">等待试炼开始...</div>
+
+    <main id="game-board"></main>
+</div>
+
+<!-- 游戏胜利后的模态框 -->
+<div id="win-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="win-icon"></div>
+        <h2>试炼成功！</h2>
+        <p id="win-time"></p>
+        <button id="continue-btn" class="modal-btn">
+            <span class="icon"><!-- 继续图标将通过 CSS 添加 --></span>
+            <span class="text">迎接新挑战</span>
+        </button>
+    </div>
+</div>
+
+<script src="xlsx.full.min.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
