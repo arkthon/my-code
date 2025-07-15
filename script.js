@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 处理开始/重置按钮的逻辑
     function handleStartButtonClick() {
         if (masterWordList.length === 0) {
-            alert('请先导入单词表！');
+            alert('请先导入单词表！(项目里有示例xlsx文件)');
             return;
         }
 
